@@ -15,7 +15,6 @@ import System.IO          ( BufferMode(LineBuffering)
                           )
 import Control.Concurrent ( forkIO )
 import Control.Monad      ( when )
-import Safe
 
 main :: IO ()
 main = withSocketsDo $ do
