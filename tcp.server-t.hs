@@ -1,4 +1,3 @@
-import System.Environment ( getArgs )
 import Network            ( PortID(PortNumber)
                           , Socket
                           , connectTo
@@ -19,37 +18,24 @@ import Control.Monad      ( when )
 
 main :: IO ()
 main = withSocketsDo $ do
-
-  args <- getArgs
-  let serverHost = head args
-  let username   = head $ tail args
-
   socket <- listenOn . PortNumber $ 8181
   print socket
-  acceptLoop socket serverHost username
+  acceptLoop socket
 
-acceptLoop :: Socket -> String -> String -> IO ()
-acceptLoop socket serverHost username = do
+acceptLoop :: Socket -> IO ()
+acceptLoop socket = do
   (handle, _, _) <- accept socket
-  _ <- forkIO $ ioServerLoop handle serverHost username
-  acceptLoop socket serverHost username
+  _ <- forkIO $ ioServerLoop handle
+  acceptLoop socket
 
-ioServerLoop :: Handle -> String -> String -> IO ()
-ioServerLoop handle serverHost username = do
+ioServerLoop :: Handle -> IO ()
+ioServerLoop handle = do
   hSetBuffering handle LineBuffering
   eof <- hIsEOF handle
   when (not eof) $ do
     s <- hGetLine handle
     putStrLn $ s
-
-    senderHandle <- connectTo serverHost (PortNumber 8181)
-    hSetBuffering senderHandle LineBuffering
-
-    msg <- getLine
-    let input = show (username,msg)
-    hPutStrLn senderHandle input
-    hFlush senderHandle
     hPutStrLn handle $ "Sending this back to you: " ++ s
     hFlush handle
-    ioServerLoop handle serverHost username
+    ioServerLoop handle
 
