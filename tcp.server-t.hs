@@ -15,11 +15,10 @@ import System.IO          ( BufferMode(LineBuffering)
                           )
 import Control.Concurrent ( forkIO )
 import Control.Monad      ( when )
-
+import Safe               ( readMay )
 main :: IO ()
 main = withSocketsDo $ do
   socket <- listenOn . PortNumber $ 8181
-  print socket
   acceptLoop socket
 
 acceptLoop :: Socket -> IO ()

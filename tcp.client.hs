@@ -1,26 +1,29 @@
-import System.Environment ( getArgs )
-import System.IO          ( BufferMode(LineBuffering)
-                          , Handle
-                          , hClose
-                          , hFlush
-                          , hGetLine
-                          , hPutStrLn
-                          , hSetBuffering
-                          )
-import Network            ( PortID(PortNumber)
-                          , Socket
-                          , connectTo
-                          , accept
-                          , listenOn
-                          , withSocketsDo
-                          )
+import System.Environment       ( getArgs )
+import System.IO                ( BufferMode(LineBuffering)
+                                , Handle
+                                , hClose
+                                , hFlush
+                                , hGetLine
+                                , hPutStrLn
+                                , hSetBuffering
+                                )
+import Network                  ( PortID(PortNumber)
+                                , Socket
+                                , connectTo
+                                , accept
+                                , listenOn
+                                , withSocketsDo
+                                )
+import System.Console.Haskeline ( runInputT, defaultSettings, getInputChar )
 
 messageListener :: Handle -> String -> IO ()
 messageListener handle username = do
-  msg <- getLine
+  msg <- runInputT defaultSettings $ getInputChar ""
   let input = show (username,msg)
   hPutStrLn handle input
   hFlush handle
+  s <- hGetLine handle
+  putStrLn s
   messageListener handle username
 
 
